@@ -1,5 +1,4 @@
-var patterns = new Array();
-
+var patterns = [];
 patterns.push( { 'name': 'Google', 'pattern': 'google', 'var': 'q' } );
 patterns.push( { 'name': 'Live', 'pattern': 'search.live', 'var': 'q' } );
 patterns.push( { 'name': 'Bing', 'pattern': 'bing', 'var': 'q' } );
@@ -42,21 +41,23 @@ patterns.push( { 'name': 'Baidu', 'pattern': 'baidu', 'var': 'wd' } );
 exports.parse = function(url) {
 
 	var parts = require('url').parse(url, true);
-	console.log(require('util').inspect(parts));
 
 	var found = false;
 	var info = [];
 
-	console.log("Patterns: \n" + require('util').inspect(patterns) + "\nLength: " + patterns.length);
-
 	for (var i = 0; i < patterns.length; i++) {
 		var search = patterns[i];
 
-		console.log("Checking " + require('util').inspect(search));
-
 		if (parts.hostname.search(search.pattern) != -1) {
 			info['search_engine'] = search.name;
-			info['search_keywords'] = parts.query['q'];
+			info['search_keywords'] = parts.query[search.var];
+
+			/* Special case for Google Image Search */
+			if (typeof parts.query['prev'] != 'undefined' && parts.query['prev'].length > 0) {
+				var dparts = require('url').parse(parts.query['prev'], true);
+				info['search_keywords'] = dparts.query[search.var];
+			}
+
 			found = true;
 			break;
 		}
