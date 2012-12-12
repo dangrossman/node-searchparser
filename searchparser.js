@@ -48,6 +48,7 @@ exports.parse = function(url) {
 	for (var i = 0; i < patterns.length; i++) {
 		var search = patterns[i];
 
+		if (parts.hostname) {
 		if (parts.hostname.search(search.pattern) != -1) {
 			info['search_engine'] = search.name;
 			info['search_keywords'] = parts.query[search.var];
@@ -60,6 +61,7 @@ exports.parse = function(url) {
 
 			found = true;
 			break;
+		}
 		}
 	}
 
